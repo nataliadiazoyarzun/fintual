@@ -112,6 +112,13 @@ final class PortfolioTest extends TestCase
         );
     }
 
+    public function test_it_rejects_an_empty_allocation_when_stocks_have_value(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new Portfolio([new Stock('AAPL', 10, 100)], []);
+    }
+
     private function assertRecommendation(
         array $recommendation,
         string $ticker,
