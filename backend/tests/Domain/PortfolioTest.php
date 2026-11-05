@@ -148,6 +148,62 @@ final class PortfolioTest extends TestCase
         ];
     }
 
+    public function test_rebalance_converts_amounts_to_shares_using_each_stocks_own_price(): void
+    {
+        $portfolio = new Portfolio(
+            [new Stock('META', 10, 50), new Stock('AAPL', 1, 500)],
+            ['META' => 80, 'AAPL' => 20],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertCount(2, $recommendations);
+        $this->assertRecommendation($recommendations[0], 'AAPL', 'SELL', 300.00, 0.6);
+        $this->assertRecommendation($recommendations[1], 'META', 'BUY', 300.00, 6.0);
+    }
+
+    public function test_rebalance_supports_fractional_shares(): void
+    {
+        $portfolio = new Portfolio(
+            [new Stock('A', 1, 300), new Stock('B', 0, 7)],
+            ['A' => 50, 'B' => 50],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertCount(2, $recommendations);
+        $this->assertRecommendation($recommendations[0], 'A', 'SELL', 150.00, 0.5);
+        $this->assertRecommendation($recommendations[1], 'B', 'BUY', 150.00, 150 / 7);
+    }
+
+    public function test_rebalance_sells_entirely_a_stock_missing_from_the_allocation(): void
+    {
+        $portfolio = new Portfolio(
+            [new Stock('A', 10, 100), new Stock('B', 4, 50)],
+            ['A' => 100],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertCount(2, $recommendations);
+        $this->assertRecommendation($recommendations[0], 'B', 'SELL', 200.00, 4.0);
+        $this->assertRecommendation($recommendations[1], 'A', 'BUY', 200.00, 2.0);
+    }
+
+    public function test_allocation_keys_are_normalized_like_stock_tickers(): void
+    {
+        $portfolio = new Portfolio(
+            [new Stock('AAPL', 10, 100), new Stock('META', 10, 100)],
+            ['aapl' => 60, ' meta ' => 40],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertCount(2, $recommendations);
+        $this->assertRecommendation($recommendations[0], 'META', 'SELL', 200.00, 2.0);
+        $this->assertRecommendation($recommendations[1], 'AAPL', 'BUY', 200.00, 2.0);
+    }
+
     private function assertRecommendation(
         array $recommendation,
         string $ticker,

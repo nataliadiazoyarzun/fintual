@@ -8,41 +8,89 @@ use InvalidArgumentException;
 
 final readonly class Portfolio
 {
+    private array $allocation;
+
     /**
      * @param Stock[] $stocks
      * @param array<string, float|int> $allocation ticker => percentage (0-100)
      */
     public function __construct(
         private array $stocks,
-        private array $allocation,
+        array $allocation,
     ) {
-        if ($allocation === [] && $this->totalValue() > 0) {
-            throw new InvalidArgumentException('Allocation must not be empty when the portfolio has value.');
+        $this->allocation = $this->normalizeTickers($allocation);
+
+        $this->assertAllocationNotEmptyWhenPortfolioHasValue();
+        $this->assertNoNegativePercentages();
+        $this->assertAllocationSumsTo100();
+        $this->assertUniqueTickers();
+        $this->assertAllocationTickersExist();
+    }
+
+    /**
+     * @param array<string, float|int> $allocation
+     * @return array<string, float|int>
+     */
+    private function normalizeTickers(array $allocation): array
+    {
+        $normalized = [];
+
+        foreach ($allocation as $ticker => $percentage) {
+            $normalized[strtoupper(trim((string) $ticker))] = $percentage;
         }
 
-        foreach ($allocation as $percentage) {
+        return $normalized;
+    }
+
+    private function assertAllocationNotEmptyWhenPortfolioHasValue(): void
+    {
+        if ($this->allocation === [] && $this->totalValue() > 0) {
+            throw new InvalidArgumentException('Allocation must not be empty when the portfolio has value.');
+        }
+    }
+
+    private function assertNoNegativePercentages(): void
+    {
+        foreach ($this->allocation as $percentage) {
             if ($percentage < 0) {
                 throw new InvalidArgumentException('Allocation percentages must not be negative.');
             }
         }
+    }
 
-        if ($allocation !== [] && array_sum($allocation) != 100) {
+    private function assertAllocationSumsTo100(): void
+    {
+        if ($this->allocation !== [] && array_sum($this->allocation) != 100) {
             throw new InvalidArgumentException('Allocation percentages must sum to 100.');
         }
+    }
 
-        $tickers = array_map(fn (Stock $stock): string => $stock->ticker, $stocks);
-
-        foreach (array_count_values($tickers) as $ticker => $count) {
+    private function assertUniqueTickers(): void
+    {
+        foreach (array_count_values($this->stockTickers()) as $ticker => $count) {
             if ($count > 1) {
                 throw new InvalidArgumentException("Duplicated stock ticker {$ticker}.");
             }
         }
+    }
 
-        foreach (array_keys($allocation) as $ticker) {
+    private function assertAllocationTickersExist(): void
+    {
+        $tickers = $this->stockTickers();
+
+        foreach (array_keys($this->allocation) as $ticker) {
             if (!in_array($ticker, $tickers, true)) {
                 throw new InvalidArgumentException("Allocation ticker {$ticker} is not in the stocks.");
             }
         }
+    }
+
+    /**
+     * @return string[]
+     */
+    private function stockTickers(): array
+    {
+        return array_map(fn (Stock $stock): string => $stock->ticker, $this->stocks);
     }
 
     public function totalValue(): float
