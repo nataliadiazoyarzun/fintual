@@ -101,6 +101,17 @@ final class PortfolioTest extends TestCase
         ];
     }
 
+    public function test_it_rejects_an_allocation_ticker_that_is_not_in_the_stocks(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('ZZZ');
+
+        new Portfolio(
+            [new Stock('AAPL', 10, 100)],
+            ['AAPL' => 50, 'ZZZ' => 50],
+        );
+    }
+
     private function assertRecommendation(
         array $recommendation,
         string $ticker,

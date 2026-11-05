@@ -19,6 +19,14 @@ final readonly class Portfolio
         if ($allocation !== [] && array_sum($allocation) != 100) {
             throw new InvalidArgumentException('Allocation percentages must sum to 100.');
         }
+
+        $tickers = array_map(fn (Stock $stock): string => $stock->ticker, $stocks);
+
+        foreach (array_keys($allocation) as $ticker) {
+            if (!in_array($ticker, $tickers, true)) {
+                throw new InvalidArgumentException("Allocation ticker {$ticker} is not in the stocks.");
+            }
+        }
     }
 
     public function totalValue(): float
