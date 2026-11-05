@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain;
 
+use InvalidArgumentException;
+
 final readonly class Portfolio
 {
     /**
@@ -14,6 +16,9 @@ final readonly class Portfolio
         private array $stocks,
         private array $allocation,
     ) {
+        if ($allocation !== [] && array_sum($allocation) != 100) {
+            throw new InvalidArgumentException('Allocation percentages must sum to 100.');
+        }
     }
 
     public function totalValue(): float

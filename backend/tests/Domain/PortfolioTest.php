@@ -6,6 +6,8 @@ namespace Tests\Domain;
 
 use App\Domain\Portfolio;
 use App\Domain\Stock;
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class PortfolioTest extends TestCase
@@ -64,6 +66,39 @@ final class PortfolioTest extends TestCase
         $this->assertCount(2, $recommendations);
         $this->assertSame('SELL', $recommendations[0]['action']);
         $this->assertSame('BUY', $recommendations[1]['action']);
+    }
+
+    public function test_rebalance_buys_a_stock_in_the_allocation_that_has_zero_quantity(): void
+    {
+        $portfolio = new Portfolio(
+            [new Stock('AAPL', 10, 100), new Stock('META', 0, 50)],
+            ['AAPL' => 50, 'META' => 50],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertCount(2, $recommendations);
+        $this->assertRecommendation($recommendations[0], 'AAPL', 'SELL', 500.00, 5.0);
+        $this->assertRecommendation($recommendations[1], 'META', 'BUY', 500.00, 10.0);
+    }
+
+    #[DataProvider('allocationsNotSummingTo100')]
+    public function test_it_rejects_an_allocation_that_does_not_sum_to_100(array $allocation): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new Portfolio(
+            [new Stock('META', 10, 100), new Stock('AAPL', 10, 100)],
+            $allocation,
+        );
+    }
+
+    public static function allocationsNotSummingTo100(): array
+    {
+        return [
+            'below 100' => [['META' => 40, 'AAPL' => 50]],
+            'above 100' => [['META' => 60, 'AAPL' => 50]],
+        ];
     }
 
     private function assertRecommendation(
