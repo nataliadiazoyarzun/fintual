@@ -204,6 +204,42 @@ final class PortfolioTest extends TestCase
         $this->assertRecommendation($recommendations[1], 'AAPL', 'BUY', 200.00, 2.0);
     }
 
+    public function test_it_accepts_an_allocation_whose_float_sum_is_100_within_floating_point_error(): void
+    {
+        // 0.1 + 64.1 + 35.8 evaluates to 99.999999999999986 in floating point.
+        $portfolio = new Portfolio(
+            [new Stock('A', 10, 100), new Stock('B', 10, 100), new Stock('C', 10, 100)],
+            ['A' => 0.1, 'B' => 64.1, 'C' => 35.8],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertCount(3, $recommendations);
+        $this->assertRecommendation($recommendations[0], 'A', 'SELL', 997.00, 9.97);
+        $this->assertRecommendation($recommendations[1], 'B', 'BUY', 923.00, 9.23);
+        $this->assertRecommendation($recommendations[2], 'C', 'BUY', 74.00, 0.74);
+    }
+
+    public function test_rebalance_orders_sells_then_buys_each_group_alphabetically_by_ticker(): void
+    {
+        $portfolio = new Portfolio(
+            [
+                new Stock('D', 10, 100),
+                new Stock('C', 10, 100),
+                new Stock('B', 10, 100),
+                new Stock('A', 10, 100),
+            ],
+            ['A' => 40, 'B' => 10, 'C' => 40, 'D' => 10],
+        );
+
+        $recommendations = $portfolio->rebalance();
+
+        $this->assertSame(
+            [['B', 'SELL'], ['D', 'SELL'], ['A', 'BUY'], ['C', 'BUY']],
+            array_map(fn (array $r): array => [$r['ticker'], $r['action']], $recommendations),
+        );
+    }
+
     private function assertRecommendation(
         array $recommendation,
         string $ticker,

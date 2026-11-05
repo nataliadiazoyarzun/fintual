@@ -60,7 +60,7 @@ final readonly class Portfolio
 
     private function assertAllocationSumsTo100(): void
     {
-        if ($this->allocation !== [] && array_sum($this->allocation) != 100) {
+        if ($this->allocation !== [] && abs(array_sum($this->allocation) - 100) > 1e-6) {
             throw new InvalidArgumentException('Allocation percentages must sum to 100.');
         }
     }
@@ -91,6 +91,19 @@ final readonly class Portfolio
     private function stockTickers(): array
     {
         return array_map(fn (Stock $stock): string => $stock->ticker, $this->stocks);
+    }
+
+    /**
+     * Sells first, then buys; alphabetical by ticker within each group.
+     *
+     * @param array{ticker: string, action: string, amount: float, shares: float} $recommendation
+     * @return array{int, string}
+     */
+    private function sortKey(array $recommendation): array
+    {
+        $group = $recommendation['action'] === Action::SELL->value ? 0 : 1;
+
+        return [$group, $recommendation['ticker']];
     }
 
     public function totalValue(): float
@@ -130,7 +143,7 @@ final readonly class Portfolio
 
         usort(
             $recommendations,
-            fn (array $a, array $b): int => ($a['action'] === 'SELL' ? 0 : 1) <=> ($b['action'] === 'SELL' ? 0 : 1),
+            fn (array $a, array $b): int => $this->sortKey($a) <=> $this->sortKey($b),
         );
 
         return $recommendations;
