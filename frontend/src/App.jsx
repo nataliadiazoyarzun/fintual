@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { rebalance } from './api.js';
 import PortfolioForm, { newRow } from './components/PortfolioForm.jsx';
+import RecommendationsTable from './components/RecommendationsTable.jsx';
 
 function initialRows() {
   return [
@@ -54,7 +55,7 @@ export default function App() {
 
       {loading && <p>Cargando...</p>}
       {error && <p role="alert">Error: {error}</p>}
-      {result && <pre>{JSON.stringify(result, null, 2)}</pre>}
+      {result && <RecommendationsTable result={result} />}
     </main>
   );
 }
