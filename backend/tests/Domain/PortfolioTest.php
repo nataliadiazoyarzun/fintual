@@ -129,6 +129,25 @@ final class PortfolioTest extends TestCase
         );
     }
 
+    #[DataProvider('duplicatedStocks')]
+    public function test_it_rejects_duplicated_tickers_in_the_stocks(string $first, string $second): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new Portfolio(
+            [new Stock($first, 10, 100), new Stock($second, 5, 100)],
+            ['AAPL' => 100],
+        );
+    }
+
+    public static function duplicatedStocks(): array
+    {
+        return [
+            'exact duplicate' => ['AAPL', 'AAPL'],
+            'duplicate after normalization' => ['aapl', 'AAPL'],
+        ];
+    }
+
     private function assertRecommendation(
         array $recommendation,
         string $ticker,

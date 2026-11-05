@@ -32,6 +32,12 @@ final readonly class Portfolio
 
         $tickers = array_map(fn (Stock $stock): string => $stock->ticker, $stocks);
 
+        foreach (array_count_values($tickers) as $ticker => $count) {
+            if ($count > 1) {
+                throw new InvalidArgumentException("Duplicated stock ticker {$ticker}.");
+            }
+        }
+
         foreach (array_keys($allocation) as $ticker) {
             if (!in_array($ticker, $tickers, true)) {
                 throw new InvalidArgumentException("Allocation ticker {$ticker} is not in the stocks.");
