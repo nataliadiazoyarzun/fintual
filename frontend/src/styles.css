@@ -25,7 +25,17 @@ body {
 .app-header {
   background-color: var(--nd-ink);
   color: var(--nd-white);
-  border-bottom: 4px solid var(--nd-lime);
+  border-bottom: 1px solid #3d423d;
+}
+
+/* Small lime accent above the title: the only decorative use of the color. */
+.app-header h1::before {
+  content: '';
+  display: block;
+  width: 2.5rem;
+  height: 3px;
+  margin-bottom: 0.75rem;
+  background-color: var(--nd-lime);
 }
 
 .app-eyebrow {
@@ -33,7 +43,7 @@ body {
   font-size: 0.8rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--nd-lime);
+  color: #c4c7bf;
 }
 
 .app-subtitle {
@@ -41,12 +51,14 @@ body {
 }
 
 .app-link {
-  color: var(--nd-lime);
+  color: var(--nd-white);
+  text-decoration-color: #949990;
   text-underline-offset: 0.2em;
 }
 
 .app-link:hover {
-  color: var(--nd-white);
+  color: var(--nd-lime);
+  text-decoration-color: var(--nd-lime);
 }
 
 .app-header a:focus-visible,
@@ -58,7 +70,7 @@ body {
 
 .skip-link {
   background-color: var(--nd-ink);
-  color: var(--nd-lime);
+  color: var(--nd-white);
 }
 
 .app-footer {
@@ -69,6 +81,13 @@ body {
 .app-footer .app-link {
   color: var(--nd-ink);
   font-weight: 600;
+  text-decoration-color: #949990;
+}
+
+.app-footer .app-link:hover {
+  color: var(--nd-ink);
+  text-decoration-color: var(--nd-ink);
+  background-color: var(--nd-lime);
 }
 
 .card {
@@ -81,9 +100,9 @@ body {
   border-bottom-color: var(--nd-line);
 }
 
-/* Primary action: ink with a lime accent, like the portfolio. */
+/* Primary action: solid ink; lime appears only on hover/active. */
 .btn-primary {
-  --bs-btn-color: var(--nd-lime);
+  --bs-btn-color: var(--nd-white);
   --bs-btn-bg: var(--nd-ink);
   --bs-btn-border-color: var(--nd-ink);
   --bs-btn-hover-color: var(--nd-ink);
@@ -92,7 +111,7 @@ body {
   --bs-btn-active-color: var(--nd-ink);
   --bs-btn-active-bg: var(--nd-lime);
   --bs-btn-active-border-color: var(--nd-ink);
-  --bs-btn-disabled-color: var(--nd-lime);
+  --bs-btn-disabled-color: var(--nd-white);
   --bs-btn-disabled-bg: var(--nd-ink);
   --bs-btn-disabled-border-color: var(--nd-ink);
   --bs-btn-focus-shadow-rgb: 16, 19, 18;
