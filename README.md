@@ -4,16 +4,47 @@ Módulo de rebalanceo de portafolios de inversión: dado un portafolio y una dis
 
 Desarrollado como **prueba técnica para Fintual** por [Natalia Díaz](https://www.ndiaz.dev).
 
-- Portafolio: <https://www.ndiaz.dev>
-- Repositorio: <https://github.com/nataliadiazoyarzun/portfolio-rebalancer>
+- **Demo en línea:** <https://rebalancer.ndiaz.dev>
+- **Repositorio:** <https://github.com/nataliadiazoyarzun/portfolio-rebalancer>
+- Portafolio profesional: <https://www.ndiaz.dev>
 
 ## Capturas
 
-<!-- Reemplazar con capturas reales, por ejemplo en docs/screenshots/ -->
+Capturas tomadas de la demo desplegada.
 
-| Escritorio | Móvil |
-|---|---|
-| _Pendiente: `docs/screenshots/desktop.png`_ | _Pendiente: `docs/screenshots/mobile.png`_ |
+**Vista principal en escritorio**
+
+![Vista principal en escritorio](docs/screenshots/desktop.png)
+
+**Resultado con recomendaciones**
+
+![Resultado con recomendaciones de compra y venta](docs/screenshots/result.png)
+
+**Mensaje de error de dominio** (porcentajes que no suman 100)
+
+![Mensaje de error mostrado en la interfaz](docs/screenshots/error.png)
+
+**Vista en móvil**
+
+<img src="docs/screenshots/mobile.png" alt="Vista móvil con formulario y resultado" width="320">
+
+## Uso de IA durante el desarrollo
+
+El proyecto se desarrolló con apoyo de un asistente de IA para análisis, diseño y generación de código bajo supervisión. El detalle de qué herramientas se usaron, cómo y qué decisiones fueron de la autora está en [docs/llm-conversations.md](docs/llm-conversations.md).
+
+## Conversaciones completas de IA
+
+Además del resumen, se conserva el historial completo de las conversaciones en orden cronológico: decisiones de diseño, modelado del dominio, TDD, API, frontend, accesibilidad, despliegue y README.
+
+- Índice: [docs/llm-full-transcript.md](docs/llm-full-transcript.md)
+- Transcripciones por tema, en [docs/llm-transcripts/](docs/llm-transcripts/):
+  [01 diseño](docs/llm-transcripts/01-design.md) ·
+  [02 dominio y TDD](docs/llm-transcripts/02-domain-tdd.md) ·
+  [03 API](docs/llm-transcripts/03-api.md) ·
+  [04 frontend](docs/llm-transcripts/04-frontend.md) ·
+  [05 README](docs/llm-transcripts/05-readme.md) ·
+  [06 despliegue](docs/llm-transcripts/06-deployment.md) ·
+  [07 cierre](docs/llm-transcripts/07-closing-docs.md)
 
 ## El problema
 
@@ -33,6 +64,7 @@ El rebalanceo **solo genera recomendaciones**: no ejecuta órdenes ni persiste d
 - Tolerancia de punto flotante (`1e-6`) al validar que la distribución suma 100.
 - API HTTP con un único endpoint, `POST /rebalance`.
 - Interfaz React con formulario editable y tabla de resultados.
+- Desplegado en Vercel: frontend y backend como dos proyectos independientes.
 
 ## Arquitectura
 
@@ -67,12 +99,15 @@ El proyecto está separado en tres capas, y cada una solo conoce a la que tiene 
 | Tests | PHPUnit 11 |
 | Frontend | React 18, Vite 6, JavaScript |
 | Estilos | Bootstrap 5 (única dependencia visual) |
+| Despliegue | Vercel (frontend estático y backend PHP con el runtime comunitario `vercel-php`) |
 
 ## Estructura del proyecto
 
 ```
 portfolio-rebalancer/
 ├── backend/
+│   ├── api/
+│   │   └── index.php                  # Punto de entrada para Vercel (delega en public/index.php)
 │   ├── public/
 │   │   └── index.php                  # Entrada HTTP, CORS y enrutamiento
 │   ├── src/
@@ -88,8 +123,10 @@ portfolio-rebalancer/
 │   │   │   └── StockTest.php
 │   │   └── Http/
 │   │       └── RebalanceControllerTest.php
+│   ├── .vercelignore
 │   ├── composer.json
-│   └── phpunit.xml
+│   ├── phpunit.xml
+│   └── vercel.json                    # Runtime vercel-php y enrutamiento
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
@@ -103,6 +140,11 @@ portfolio-rebalancer/
 │   ├── index.html
 │   ├── package.json
 │   └── vite.config.js
+├── docs/
+│   ├── llm-conversations.md           # Uso de IA durante el desarrollo (resumen)
+│   ├── llm-full-transcript.md         # Índice de las conversaciones completas
+│   ├── llm-transcripts/               # Transcripciones por tema (01 a 07)
+│   └── screenshots/                   # Capturas de la demo
 └── README.md
 ```
 
@@ -138,7 +180,22 @@ Para generar la versión de producción:
 npm run build
 ```
 
-> El CORS del backend solo permite los orígenes `http://localhost:5173` y `http://127.0.0.1:5173`, pensados para desarrollo. Para desplegar el frontend en otro dominio hay que ajustar la lista `ALLOWED_ORIGINS` en `backend/public/index.php`.
+> CORS: por defecto el backend solo permite `http://localhost:5173` y `http://127.0.0.1:5173`. Para otros orígenes se define la variable de entorno `ALLOWED_ORIGINS` con una lista separada por comas, sin espacios ni barra final.
+
+## Despliegue
+
+La demo corre en Vercel como **dos proyectos independientes** del mismo repositorio:
+
+| Proyecto | Root Directory | Configuración |
+|---|---|---|
+| Frontend | `frontend` | Preset Vite. Variable `VITE_API_URL` con la URL del backend, definida al compilar. |
+| Backend | `backend` | Preset Other. `vercel.json` usa el runtime `vercel-php`. Variable `ALLOWED_ORIGINS` con el origen del frontend. |
+
+Notas:
+
+- `vercel-php` es un runtime **mantenido por la comunidad**, no un runtime oficial de Vercel. Si dejara de funcionar, el plan alternativo es empaquetar el backend en un contenedor Docker.
+- En producción el backend se ejecuta con una versión de PHP más reciente que la usada en local (8.3), y la suite de tests se ejecuta únicamente en local.
+- Cambiar `ALLOWED_ORIGINS` o `VITE_API_URL` requiere un nuevo despliegue del proyecto correspondiente.
 
 ## Cómo ejecutar los tests
 
@@ -268,11 +325,9 @@ Esta distinción evita errores 500 por `TypeError` y deja claro quién debe corr
 - Pruebas de integración end-to-end del flujo completo.
 - Tolerancia mínima configurable para evitar recomendaciones de importes insignificantes.
 - Opción de operar solo con acciones enteras.
-- Configurar los orígenes CORS mediante variables de entorno.
-- Contenerizar backend y frontend con Docker.
+- Contenerizar el backend con Docker como alternativa al runtime comunitario `vercel-php`.
 - Integración continua que ejecute PHPUnit y `npm run build`.
 - Auditorías automáticas de accesibilidad.
-- Subir capturas reales y un despliegue de demostración.
 
 ## Sobre la autora
 
