@@ -20,6 +20,12 @@ final readonly class Portfolio
             throw new InvalidArgumentException('Allocation must not be empty when the portfolio has value.');
         }
 
+        foreach ($allocation as $percentage) {
+            if ($percentage < 0) {
+                throw new InvalidArgumentException('Allocation percentages must not be negative.');
+            }
+        }
+
         if ($allocation !== [] && array_sum($allocation) != 100) {
             throw new InvalidArgumentException('Allocation percentages must sum to 100.');
         }

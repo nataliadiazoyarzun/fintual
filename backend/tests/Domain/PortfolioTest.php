@@ -119,6 +119,16 @@ final class PortfolioTest extends TestCase
         new Portfolio([new Stock('AAPL', 10, 100)], []);
     }
 
+    public function test_it_rejects_a_negative_allocation_percentage(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+
+        new Portfolio(
+            [new Stock('META', 10, 100), new Stock('AAPL', 10, 100)],
+            ['META' => -10, 'AAPL' => 110],
+        );
+    }
+
     private function assertRecommendation(
         array $recommendation,
         string $ticker,
