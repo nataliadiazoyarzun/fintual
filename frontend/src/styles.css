@@ -1,3 +1,115 @@
+/* Palette taken from ndiaz.dev; Bootstrap stays the base and is only themed. */
+:root {
+  --nd-ink: #101312;
+  --nd-paper: #f4f1e9;
+  --nd-white: #fffdf7;
+  --nd-line: #d9d7cb;
+  --nd-muted: #505750;
+  --nd-lime: #d7f35d;
+
+  --bs-body-bg: var(--nd-paper);
+  --bs-body-color: var(--nd-ink);
+  --bs-secondary-color: var(--nd-muted);
+  --bs-border-color: var(--nd-line);
+  --bs-card-bg: var(--nd-white);
+}
+
 body {
-  background-color: #f4f6f9;
+  background-color: var(--nd-paper);
+}
+
+.app-container {
+  max-width: 800px;
+}
+
+.app-header {
+  background-color: var(--nd-ink);
+  color: var(--nd-white);
+  border-bottom: 4px solid var(--nd-lime);
+}
+
+.app-eyebrow {
+  font-family: ui-monospace, 'DM Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nd-lime);
+}
+
+.app-subtitle {
+  color: #c4c7bf;
+}
+
+.app-link {
+  color: var(--nd-lime);
+  text-underline-offset: 0.2em;
+}
+
+.app-link:hover {
+  color: var(--nd-white);
+}
+
+.app-header a:focus-visible,
+.app-footer a:focus-visible {
+  outline: 3px solid var(--nd-lime);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  background-color: var(--nd-ink);
+  color: var(--nd-lime);
+}
+
+.app-footer {
+  border-top: 1px solid var(--nd-line);
+  color: var(--nd-muted);
+}
+
+.app-footer .app-link {
+  color: var(--nd-ink);
+  font-weight: 600;
+}
+
+.card {
+  border-color: var(--nd-line);
+  box-shadow: none;
+}
+
+.card-header {
+  background-color: var(--nd-white);
+  border-bottom-color: var(--nd-line);
+}
+
+/* Primary action: ink with a lime accent, like the portfolio. */
+.btn-primary {
+  --bs-btn-color: var(--nd-lime);
+  --bs-btn-bg: var(--nd-ink);
+  --bs-btn-border-color: var(--nd-ink);
+  --bs-btn-hover-color: var(--nd-ink);
+  --bs-btn-hover-bg: var(--nd-lime);
+  --bs-btn-hover-border-color: var(--nd-ink);
+  --bs-btn-active-color: var(--nd-ink);
+  --bs-btn-active-bg: var(--nd-lime);
+  --bs-btn-active-border-color: var(--nd-ink);
+  --bs-btn-disabled-color: var(--nd-lime);
+  --bs-btn-disabled-bg: var(--nd-ink);
+  --bs-btn-disabled-border-color: var(--nd-ink);
+  --bs-btn-focus-shadow-rgb: 16, 19, 18;
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--nd-ink);
+  --bs-btn-border-color: var(--nd-ink);
+  --bs-btn-hover-color: var(--nd-ink);
+  --bs-btn-hover-bg: var(--nd-lime);
+  --bs-btn-hover-border-color: var(--nd-ink);
+  --bs-btn-active-color: var(--nd-ink);
+  --bs-btn-active-bg: var(--nd-lime);
+  --bs-btn-active-border-color: var(--nd-ink);
+}
+
+.form-control:focus {
+  border-color: var(--nd-ink);
+  box-shadow: 0 0 0 0.2rem rgba(215, 243, 93, 0.6);
 }
