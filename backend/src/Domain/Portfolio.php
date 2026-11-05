@@ -27,8 +27,35 @@ final readonly class Portfolio
         return $total;
     }
 
+    /**
+     * @return array<int, array{ticker: string, action: string, amount: float, shares: float}>
+     */
     public function rebalance(): array
     {
-        return [];
+        $total = $this->totalValue();
+        $recommendations = [];
+
+        foreach ($this->stocks as $stock) {
+            $targetValue = $total * ($this->allocation[$stock->ticker] ?? 0) / 100;
+            $delta = round($targetValue - $stock->value(), 2);
+
+            if ($delta == 0) {
+                continue;
+            }
+
+            $recommendations[] = [
+                'ticker' => $stock->ticker,
+                'action' => ($delta > 0 ? Action::BUY : Action::SELL)->value,
+                'amount' => abs($delta),
+                'shares' => abs($delta) / $stock->currentPrice,
+            ];
+        }
+
+        usort(
+            $recommendations,
+            fn (array $a, array $b): int => ($a['action'] === 'SELL' ? 0 : 1) <=> ($b['action'] === 'SELL' ? 0 : 1),
+        );
+
+        return $recommendations;
     }
 }
