@@ -19,7 +19,7 @@ final class RebalanceController
         $data = $this->decode($rawBody);
 
         if ($data === null) {
-            return ['status' => 400, 'body' => ['error' => 'Invalid request.']];
+            return ['status' => 400, 'body' => ['error' => 'Solicitud inválida.']];
         }
 
         try {

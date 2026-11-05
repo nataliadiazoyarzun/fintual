@@ -33,7 +33,7 @@ $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 if ($path !== '/rebalance') {
-    send(404, ['error' => 'Not found.']);
+    send(404, ['error' => 'No encontrado.']);
 }
 
 if ($method === 'OPTIONS') {
@@ -42,7 +42,7 @@ if ($method === 'OPTIONS') {
 
 if ($method !== 'POST') {
     header('Allow: POST, OPTIONS');
-    send(405, ['error' => 'Method not allowed.']);
+    send(405, ['error' => 'Método no permitido.']);
 }
 
 $response = (new RebalanceController())->handle((string) file_get_contents('php://input'));

@@ -1,5 +1,8 @@
 const LOCALE = 'es-CL';
 
+// Display labels only; the API contract keeps BUY/SELL.
+const ACTION_LABELS = { BUY: 'Comprar', SELL: 'Vender' };
+
 const amountFormat = new Intl.NumberFormat(LOCALE, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -28,16 +31,16 @@ export default function RecommendationsTable({ result }) {
           <thead>
             <tr>
               <th>Ticker</th>
-              <th>Action</th>
-              <th>Amount</th>
-              <th>Shares</th>
+              <th>Acción</th>
+              <th>Monto</th>
+              <th>Cantidad de acciones</th>
             </tr>
           </thead>
           <tbody>
             {recommendations.map((rec) => (
               <tr key={`${rec.action}-${rec.ticker}`}>
                 <td>{rec.ticker}</td>
-                <td>{rec.action}</td>
+                <td>{ACTION_LABELS[rec.action] ?? rec.action}</td>
                 <td>{amountFormat.format(rec.amount)}</td>
                 <td>{sharesFormat.format(rec.shares)}</td>
               </tr>

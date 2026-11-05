@@ -44,7 +44,7 @@ export default function App() {
 
   return (
     <main>
-      <h1>Portfolio Rebalancer</h1>
+      <h1>Rebalanceador de portafolio</h1>
 
       <PortfolioForm
         rows={rows}

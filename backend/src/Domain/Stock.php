@@ -18,15 +18,15 @@ final readonly class Stock
         $normalized = strtoupper(trim($ticker));
 
         if ($normalized === '') {
-            throw new InvalidArgumentException('Ticker must not be empty.');
+            throw new InvalidArgumentException('El ticker no puede estar vacío.');
         }
 
         if ($currentPrice <= 0) {
-            throw new InvalidArgumentException('Current price must be greater than zero.');
+            throw new InvalidArgumentException('El precio actual debe ser mayor que cero.');
         }
 
         if ($quantity < 0) {
-            throw new InvalidArgumentException('Quantity must not be negative.');
+            throw new InvalidArgumentException('La cantidad no puede ser negativa.');
         }
 
         $this->ticker = $normalized;

@@ -45,7 +45,7 @@ final readonly class Portfolio
     private function assertAllocationNotEmptyWhenPortfolioHasValue(): void
     {
         if ($this->allocation === [] && $this->totalValue() > 0) {
-            throw new InvalidArgumentException('Allocation must not be empty when the portfolio has value.');
+            throw new InvalidArgumentException('La distribución objetivo no puede estar vacía cuando el portafolio tiene valor.');
         }
     }
 
@@ -53,7 +53,7 @@ final readonly class Portfolio
     {
         foreach ($this->allocation as $percentage) {
             if ($percentage < 0) {
-                throw new InvalidArgumentException('Allocation percentages must not be negative.');
+                throw new InvalidArgumentException('Los porcentajes de la distribución objetivo no pueden ser negativos.');
             }
         }
     }
@@ -61,7 +61,7 @@ final readonly class Portfolio
     private function assertAllocationSumsTo100(): void
     {
         if ($this->allocation !== [] && abs(array_sum($this->allocation) - 100) > 1e-6) {
-            throw new InvalidArgumentException('Allocation percentages must sum to 100.');
+            throw new InvalidArgumentException('Los porcentajes de la distribución objetivo deben sumar 100.');
         }
     }
 
@@ -69,7 +69,7 @@ final readonly class Portfolio
     {
         foreach (array_count_values($this->stockTickers()) as $ticker => $count) {
             if ($count > 1) {
-                throw new InvalidArgumentException("Duplicated stock ticker {$ticker}.");
+                throw new InvalidArgumentException("El ticker {$ticker} está duplicado en las acciones.");
             }
         }
     }
@@ -80,7 +80,7 @@ final readonly class Portfolio
 
         foreach (array_keys($this->allocation) as $ticker) {
             if (!in_array($ticker, $tickers, true)) {
-                throw new InvalidArgumentException("Allocation ticker {$ticker} is not in the stocks.");
+                throw new InvalidArgumentException("El ticker {$ticker} de la distribución objetivo no está en las acciones.");
             }
         }
     }

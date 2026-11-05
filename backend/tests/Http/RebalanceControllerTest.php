@@ -40,7 +40,7 @@ final class RebalanceControllerTest extends TestCase
 
         $this->assertSame(422, $response['status']);
         $this->assertSame(
-            ['error' => 'Allocation percentages must sum to 100.'],
+            ['error' => 'Los porcentajes de la distribución objetivo deben sumar 100.'],
             $response['body'],
         );
     }
@@ -51,7 +51,7 @@ final class RebalanceControllerTest extends TestCase
         $response = (new RebalanceController())->handle(json_encode($payload));
 
         $this->assertSame(400, $response['status']);
-        $this->assertSame(['error' => 'Invalid request.'], $response['body']);
+        $this->assertSame(['error' => 'Solicitud inválida.'], $response['body']);
     }
 
     public static function wronglyTypedRequests(): array
@@ -82,7 +82,7 @@ final class RebalanceControllerTest extends TestCase
         $response = (new RebalanceController())->handle($rawBody);
 
         $this->assertSame(400, $response['status']);
-        $this->assertSame(['error' => 'Invalid request.'], $response['body']);
+        $this->assertSame(['error' => 'Solicitud inválida.'], $response['body']);
     }
 
     public static function malformedRequests(): array
