@@ -43,19 +43,33 @@ export default function App() {
   }
 
   return (
-    <main>
-      <h1>Rebalanceador de portafolio</h1>
+    <main className="container py-5" style={{ maxWidth: 800 }}>
+      <h1 className="h3 mb-4">Rebalanceador de portafolio</h1>
 
-      <PortfolioForm
-        rows={rows}
-        onChange={setRows}
-        onSubmit={handleRebalance}
-        loading={loading}
-      />
+      <div className="card shadow-sm mb-4">
+        <div className="card-header fw-semibold">Tu portafolio</div>
+        <div className="card-body">
+          <PortfolioForm
+            rows={rows}
+            onChange={setRows}
+            onSubmit={handleRebalance}
+            loading={loading}
+          />
+        </div>
+      </div>
 
-      {loading && <p>Cargando...</p>}
-      {error && <p role="alert">Error: {error}</p>}
-      {result && <RecommendationsTable result={result} />}
+      {loading && (
+        <p className="text-muted" role="status">
+          Cargando...
+        </p>
+      )}
+      {error && (
+        <div className="alert alert-danger" role="alert">
+          Error: {error}
+        </div>
+      )}
+      {/* The live region exists before the result so screen readers announce it. */}
+      <div aria-live="polite">{result && <RecommendationsTable result={result} />}</div>
     </main>
   );
 }

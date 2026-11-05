@@ -1,4 +1,24 @@
+import { useEffect, useRef, useState } from 'react';
+
+const FIELDS = [
+  { name: 'ticker', label: 'Ticker', type: 'text', col: 'col-12 col-md-3' },
+  { name: 'quantity', label: 'Cantidad', type: 'number', col: 'col-6 col-md-2' },
+  { name: 'price', label: 'Precio', type: 'number', col: 'col-6 col-md-2' },
+  { name: 'target', label: 'Objetivo (%)', type: 'number', col: 'col-6 col-md-3' },
+];
+
 export default function PortfolioForm({ rows, onChange, onSubmit, loading }) {
+  const [focusId, setFocusId] = useState(null);
+  const tickerInputs = useRef({});
+
+  // After adding a row, move keyboard focus to its ticker field.
+  useEffect(() => {
+    if (focusId !== null) {
+      tickerInputs.current[focusId]?.focus();
+      setFocusId(null);
+    }
+  }, [focusId]);
+
   function updateRow(id, field, value) {
     onChange(rows.map((row) => (row.id === id ? { ...row, [field]: value } : row)));
   }
@@ -8,7 +28,9 @@ export default function PortfolioForm({ rows, onChange, onSubmit, loading }) {
   }
 
   function addRow() {
-    onChange([...rows, newRow()]);
+    const row = newRow();
+    onChange([...rows, row]);
+    setFocusId(row.id);
   }
 
   function handleSubmit(event) {
@@ -18,69 +40,66 @@ export default function PortfolioForm({ rows, onChange, onSubmit, loading }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <table>
-        <thead>
-          <tr>
-            <th>Ticker</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Objetivo (%)</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
-              <td>
-                <input
-                  aria-label="Ticker"
-                  value={row.ticker}
-                  onChange={(e) => updateRow(row.id, 'ticker', e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label="Cantidad"
-                  type="number"
-                  step="any"
-                  value={row.quantity}
-                  onChange={(e) => updateRow(row.id, 'quantity', e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label="Precio"
-                  type="number"
-                  step="any"
-                  value={row.price}
-                  onChange={(e) => updateRow(row.id, 'price', e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label="Objetivo (%)"
-                  type="number"
-                  step="any"
-                  value={row.target}
-                  onChange={(e) => updateRow(row.id, 'target', e.target.value)}
-                />
-              </td>
-              <td>
-                <button type="button" onClick={() => removeRow(row.id)}>
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Column headers for wide screens; on mobile each field shows its own label. */}
+      <div className="row g-2 mb-2 fw-semibold d-none d-md-flex" aria-hidden="true">
+        {FIELDS.map((field) => (
+          <div key={field.name} className={field.col}>
+            {field.label}
+          </div>
+        ))}
+      </div>
 
-      <button type="button" onClick={addRow}>
-        Agregar fila
-      </button>{' '}
-      <button type="submit" disabled={loading}>
-        Rebalancear
-      </button>
+      {rows.map((row, index) => (
+        <div
+          key={row.id}
+          role="group"
+          aria-label={`Fila ${index + 1}`}
+          className="row g-2 align-items-end pb-3 mb-3 border-bottom"
+        >
+          {FIELDS.map((field) => (
+            <div key={field.name} className={field.col}>
+              <span className="d-block small text-muted mb-1 d-md-none" aria-hidden="true">
+                {field.label}
+              </span>
+              <input
+                className="form-control"
+                aria-label={`${field.label}, fila ${index + 1}`}
+                type={field.type}
+                step={field.type === 'number' ? 'any' : undefined}
+                autoComplete={field.name === 'ticker' ? 'off' : undefined}
+                ref={
+                  field.name === 'ticker'
+                    ? (el) => {
+                        tickerInputs.current[row.id] = el;
+                      }
+                    : undefined
+                }
+                value={row[field.name]}
+                onChange={(e) => updateRow(row.id, field.name, e.target.value)}
+              />
+            </div>
+          ))}
+          <div className="col-6 col-md-2 text-end">
+            <button
+              type="button"
+              className="btn btn-outline-danger"
+              aria-label={`Eliminar fila ${index + 1}`}
+              onClick={() => removeRow(row.id)}
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ))}
+
+      <div className="d-flex justify-content-between gap-2">
+        <button type="button" className="btn btn-outline-secondary" onClick={addRow}>
+          Agregar fila
+        </button>
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Calculando...' : 'Rebalancear'}
+        </button>
+      </div>
     </form>
   );
 }
