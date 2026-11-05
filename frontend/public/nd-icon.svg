@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 297" role="img" aria-labelledby="title desc">
+  <title id="title">ND</title>
+  <desc id="desc">Monograma ND de Natalia Díaz Oyarzún</desc>
+  <defs>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M72 0H0V72" fill="none" stroke="#2b302e" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="384" height="297" fill="#101312"/>
+  <rect width="384" height="297" fill="url(#grid)"/>
+  <path d="M0 47 80 10 232 297" fill="none" stroke="#ff795f" stroke-width="1.5"/>
+  <path d="m384 48-25 70 25 18" fill="#d7f35d"/>
+  <g font-family="Space Grotesk, Arial, sans-serif" font-size="260" font-weight="700" letter-spacing="-28">
+    <text x="30" y="245" fill="#f4f1e9">N</text>
+    <path d="M168 69H246C299 69 326 98 326 151V177C326 230 299 259 246 259H168V227H191V101H168Z" fill="#ff795f"/>
+    <path d="M225 102V226H244C271 226 286 208 286 177V151C286 120 271 102 244 102Z" fill="#101312"/>
+  </g>
+</svg>
