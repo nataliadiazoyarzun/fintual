@@ -45,6 +45,37 @@ final class RebalanceControllerTest extends TestCase
         );
     }
 
+    #[DataProvider('wronglyTypedRequests')]
+    public function test_a_request_with_wrongly_typed_values_returns_400(array $payload): void
+    {
+        $response = (new RebalanceController())->handle(json_encode($payload));
+
+        $this->assertSame(400, $response['status']);
+        $this->assertSame(['error' => 'Invalid request.'], $response['body']);
+    }
+
+    public static function wronglyTypedRequests(): array
+    {
+        $stock = ['ticker' => 'META', 'quantity' => 10, 'price' => 100];
+        $allocation = ['META' => 100];
+
+        return [
+            'quantity as text' => [['stocks' => [[...$stock, 'quantity' => 'abc']], 'allocation' => $allocation]],
+            'quantity as boolean' => [['stocks' => [[...$stock, 'quantity' => true]], 'allocation' => $allocation]],
+            'quantity as array' => [['stocks' => [[...$stock, 'quantity' => [10]]], 'allocation' => $allocation]],
+            'price as text' => [['stocks' => [[...$stock, 'price' => 'abc']], 'allocation' => $allocation]],
+            'price as boolean' => [['stocks' => [[...$stock, 'price' => true]], 'allocation' => $allocation]],
+            'price as array' => [['stocks' => [[...$stock, 'price' => [100]]], 'allocation' => $allocation]],
+            'ticker as number' => [['stocks' => [[...$stock, 'ticker' => 123]], 'allocation' => $allocation]],
+            'ticker as array' => [['stocks' => [[...$stock, 'ticker' => ['META']]], 'allocation' => $allocation]],
+            'allocation value as text' => [['stocks' => [$stock], 'allocation' => ['META' => 'abc']]],
+            'allocation value as boolean' => [['stocks' => [$stock], 'allocation' => ['META' => true]]],
+            'allocation value as array' => [['stocks' => [$stock], 'allocation' => ['META' => [100]]]],
+            'allocation value as null' => [['stocks' => [$stock], 'allocation' => ['META' => null]]],
+            'stocks item is not an object' => [['stocks' => ['META'], 'allocation' => $allocation]],
+        ];
+    }
+
     #[DataProvider('malformedRequests')]
     public function test_a_malformed_request_returns_400(string $rawBody): void
     {

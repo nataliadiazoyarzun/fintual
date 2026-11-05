@@ -57,11 +57,27 @@ final class RebalanceController
         }
 
         foreach ($data['stocks'] as $item) {
-            if (!is_array($item) || !isset($item['ticker'], $item['quantity'], $item['price'])) {
+            if (
+                !is_array($item)
+                || !is_string($item['ticker'] ?? null)
+                || !$this->isNumber($item['quantity'] ?? null)
+                || !$this->isNumber($item['price'] ?? null)
+            ) {
+                return null;
+            }
+        }
+
+        foreach ($data['allocation'] as $percentage) {
+            if (!$this->isNumber($percentage)) {
                 return null;
             }
         }
 
         return $data;
+    }
+
+    private function isNumber(mixed $value): bool
+    {
+        return is_int($value) || is_float($value);
     }
 }
