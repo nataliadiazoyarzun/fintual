@@ -1,16 +1,28 @@
 import { useState } from 'react';
 import { rebalance } from './api.js';
+import PortfolioForm, { newRow } from './components/PortfolioForm.jsx';
 
-// Temporary sample data until PortfolioForm exists.
-const SAMPLE_STOCKS = [
-  { ticker: 'META', quantity: 10, price: 100 },
-  { ticker: 'AAPL', quantity: 10, price: 100 },
-];
-const SAMPLE_ALLOCATION = { META: 40, AAPL: 60 };
+function initialRows() {
+  return [
+    newRow({ ticker: 'META', quantity: '10', price: '100', target: '40' }),
+    newRow({ ticker: 'AAPL', quantity: '10', price: '100', target: '60' }),
+  ];
+}
+
+// Only converts form text to JSON numbers; every rule is validated by the backend.
+function buildPayload(rows) {
+  return {
+    stocks: rows.map((row) => ({
+      ticker: row.ticker,
+      quantity: Number(row.quantity),
+      price: Number(row.price),
+    })),
+    allocation: Object.fromEntries(rows.map((row) => [row.ticker, Number(row.target)])),
+  };
+}
 
 export default function App() {
-  const [stocks] = useState(SAMPLE_STOCKS);
-  const [allocation] = useState(SAMPLE_ALLOCATION);
+  const [rows, setRows] = useState(initialRows);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
@@ -21,7 +33,7 @@ export default function App() {
     setResult(null);
 
     try {
-      setResult(await rebalance({ stocks, allocation }));
+      setResult(await rebalance(buildPayload(rows)));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -33,9 +45,12 @@ export default function App() {
     <main>
       <h1>Portfolio Rebalancer</h1>
 
-      <button onClick={handleRebalance} disabled={loading}>
-        Rebalancear
-      </button>
+      <PortfolioForm
+        rows={rows}
+        onChange={setRows}
+        onSubmit={handleRebalance}
+        loading={loading}
+      />
 
       {loading && <p>Cargando...</p>}
       {error && <p role="alert">Error: {error}</p>}
