@@ -6,13 +6,23 @@ use App\Http\RebalanceController;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-const ALLOWED_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+// Orígenes separados por coma. Sin la variable, se usan los de desarrollo local.
+function allowedOrigins(): array
+{
+    $configured = getenv('ALLOWED_ORIGINS');
+
+    if ($configured === false || trim($configured) === '') {
+        return ['http://localhost:5173', 'http://127.0.0.1:5173'];
+    }
+
+    return array_values(array_filter(array_map('trim', explode(',', $configured))));
+}
 
 function send(int $status, ?array $body = null): never
 {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
-    if (in_array($origin, ALLOWED_ORIGINS, true)) {
+    if (in_array($origin, allowedOrigins(), true)) {
         header("Access-Control-Allow-Origin: {$origin}");
         header('Vary: Origin');
         header('Access-Control-Allow-Methods: POST, OPTIONS');
